@@ -1,0 +1,206 @@
+{% extends "base.html" %}
+{% block content %}
+
+<!-- HEADER -->
+
+
+<!-- ================= ADD PRODUCT ================= -->
+<div class="card">
+  <h3>Add New Product</h3>
+
+  <form method="post" action="/admin/add_product">
+    <div class="form-group">
+      <input name="name" required placeholder=" ">
+      <label>Product Name</label>
+    </div>
+
+    <div class="form-group">
+      <input name="brand" required placeholder=" ">
+      <label>Brand</label>
+    </div>
+
+    <div class="form-group">
+      <input type="date" name="manufactured" required>
+      <label>Manufacture Date</label>
+    </div>
+
+    <button class="btn-primary">Add Product</button>
+  </form>
+</div>
+
+<!-- ================= SEARCH ================= -->
+<div class="card">
+  <h3>Search Products</h3>
+
+  <form method="get" action="/admin">
+    <div class="form-group">
+      <input name="search" value="{{ search }}" placeholder=" ">
+      <label>Search by Name or Brand</label>
+    </div>
+    <button class="btn-primary">Search</button>
+    <a href="/admin" style="margin-left:10px;">Clear</a>
+  </form>
+</div>
+
+<!-- ================= ACTIVE PRODUCTS ================= -->
+<div class="card">
+  <h3>Active Products</h3>
+
+  {% if products|length == 0 %}
+    <p style="color:#64748b;">No active products found.</p>
+  {% endif %}
+
+  {% for p in products %}
+  <div style="border:1px solid #e5e7eb;border-radius:10px;padding:16px;margin-bottom:18px;">
+    <p>
+      <b>{{ p.name }}</b>
+      <span style="color:#64748b;">({{ p.brand }})</span>
+    </p>
+    <p style="color:#64748b;font-size:13px;">
+      Manufactured: {{ p.manufactured }}
+    </p>
+
+    <!-- QR GENERATION -->
+    <form method="post" action="/admin/generate/{{ p.id }}">
+      <div class="form-group">
+        <input type="number" name="qty" min="1" required placeholder=" ">
+        <label>QR Quantity</label>
+      </div>
+      <button class="btn-primary">Generate QR Codes</button>
+    </form>
+
+    <!-- DOWNLOADS -->
+    <div style="margin-top:10px;">
+      <a href="/admin/download_qr_pdf/{{ p.id }}">
+        <button class="btn-secondary">Download QR PDF</button>
+      </a>
+      <a href="/admin/download_excel">
+        <button class="btn-secondary">Download Excel</button>
+      </a>
+    </div>
+
+    <!-- ACTION BUTTONS -->
+    <div style="display:flex;gap:10px;margin-top:14px;">
+      
+      <!-- ARCHIVE -->
+      <form method="post" action="/admin/archive_product/{{ p.id }}"
+            onsubmit="return confirm('Archive this product?');">
+        <button style="
+          background:#f59e0b;
+          color:white;
+          padding:6px 14px;
+          border:none;
+          border-radius:6px;
+        ">
+          Archive
+        </button>
+      </form>
+
+      <!-- DELETE -->
+      <form method="post" action="/admin/delete_product/{{ p.id }}"
+            onsubmit="return confirm('Delete product permanently?');">
+        <button style="
+          background:#dc2626;
+          color:white;
+          padding:6px 14px;
+          border:none;
+          border-radius:6px;
+        ">
+          Delete
+        </button>
+      </form>
+    </div>
+  </div>
+  {% endfor %}
+</div>
+
+<!-- ================= ARCHIVED PRODUCTS ================= -->
+<div class="card">
+  <h3>Archived Products</h3>
+
+  {% if archived|length == 0 %}
+    <p style="color:#64748b;">No archived products.</p>
+  {% endif %}
+
+  {% for p in archived %}
+  <div style="
+    border:1px dashed #94a3b8;
+    border-radius:10px;
+    padding:14px;
+    margin-bottom:14px;
+    background:#f8fafc;
+  ">
+    <p>
+      <b>{{ p.name }}</b>
+      <span style="color:#64748b;">({{ p.brand }})</span>
+    </p>
+    <p style="font-size:13px;color:#64748b;">
+      Archived Product
+    </p>
+  </div>
+  {% endfor %}
+</div>
+
+<!-- ================= COMPLAINT TOKENS ================= -->
+<div class="card">
+  <h3>Complaint Tokens</h3>
+
+  {% if tokens|length == 0 %}
+    <p style="color:#64748b;">No complaint tokens received.</p>
+  {% endif %}
+
+  {% for t in tokens %}
+  <div style="
+    border:1px solid #e5e7eb;
+    border-left:6px solid {% if t.status == 'OPEN' %}#dc2626{% else %}#16a34a{% endif %};
+    border-radius:10px;
+    padding:16px;
+    margin-bottom:18px;
+  ">
+
+    <div style="display:flex;justify-content:space-between;">
+      <b>Token #{{ t.id }}</b>
+      <span style="
+        padding:4px 10px;
+        border-radius:20px;
+        font-size:12px;
+        color:white;
+        background:{% if t.status == 'OPEN' %}#dc2626{% else %}#16a34a{% endif %};
+      ">
+        {{ t.status }}
+      </span>
+    </div>
+
+    <hr>
+
+    <p><b>Product:</b> {{ t.product_name }} ({{ t.brand }})</p>
+    <p><b>Entered Code:</b> {{ t.code }}</p>
+    <p><b>Issue:</b> {{ t.issue }}</p>
+    <p><b>Customer:</b> {{ t.customer_name }} — {{ t.customer_contact }}</p>
+
+    <p style="font-size:13px;color:#64748b;">
+      Raised on {{ t.created_at }}
+    </p>
+
+    {% if t.admin_reply %}
+      <div style="background:#f0fdf4;padding:10px;border-radius:8px;">
+        <b>Admin Reply:</b>
+        <p style="margin:4px 0;">{{ t.admin_reply }}</p>
+      </div>
+    {% else %}
+      <form method="post" action="/admin/reply_token" style="margin-top:10px;">
+        <input type="hidden" name="token_id" value="{{ t.id }}">
+
+        <div class="form-group">
+          <textarea name="reply" required placeholder=" "></textarea>
+          <label>Admin Reply</label>
+        </div>
+
+        <button class="btn-primary">Send Reply</button>
+      </form>
+    {% endif %}
+  </div>
+  {% endfor %}
+</div>
+
+{% endblock %}

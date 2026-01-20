@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+{% block content %}
+
+<!-- ================= WORKER VERIFY ================= -->
+<div class="card">
+  <h3>Worker Product Verification</h3>
+
+  <form method="post">
+    <div class="form-group">
+      <input name="code" required placeholder=" ">
+      <label>Scan or Enter Product Code</label>
+    </div>
+
+    <button class="btn-primary">Verify Product</button>
+  </form>
+</div>
+
+{% if result %}
+<!-- ================= VERIFICATION RESULT ================= -->
+<div class="card">
+  <h3>Verification Result</h3>
+
+  <p style="font-size:16px;font-weight:600">{{ result }}</p>
+
+  {% if scan_count %}
+  <p>
+    <b>QR Scan Count:</b>
+    <span class="status partial">{{ scan_count }}</span>
+  </p>
+  {% endif %}
+</div>
+
+{% if passport %}
+<!-- ================= DIGITAL PRODUCT PASSPORT ================= -->
+<div class="card">
+  <h3>Digital Product Passport (Internal)</h3>
+
+  <div style="border-left:3px solid #2563eb;padding-left:15px">
+    {% for p in passport %}
+    <div style="margin-bottom:14px">
+      <p style="margin:0;font-weight:600">
+        {{ p.event }}
+        <span style="color:#64748b;font-weight:normal">
+          — {{ p.role }}
+        </span>
+      </p>
+      <p style="margin:0;font-size:13px;color:#64748b">
+        {{ p.timestamp }}
+      </p>
+    </div>
+    {% endfor %}
+  </div>
+</div>
+{% endif %}
+{% endif %}
+
+{% endblock %}

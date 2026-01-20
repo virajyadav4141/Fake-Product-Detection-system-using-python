@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>QR Product Authenticity System</title>
+
+<script src="https://unpkg.com/html5-qrcode"></script>
+
+<style>
+*{box-sizing:border-box}
+
+body{
+  margin:0;
+  font-family:"Segoe UI",Arial,sans-serif;
+  background:#f1f5f9;
+  color:#1f2937;
+}
+
+/* ===== HEADER ===== */
+header{
+  background:#0f172a;
+  color:white;
+  padding:16px 30px;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+}
+
+header h2{margin:0;font-size:20px}
+
+nav a{
+  text-decoration:none;
+  margin-left:12px;
+  padding:8px 14px;
+  border-radius:6px;
+  font-weight:600;
+  font-size:14px;
+  color:white;
+}
+
+.dashboard-btn{background:#2563eb}
+.logout-btn{background:#dc2626}
+
+.logout-btn:hover{background:#b91c1c}
+.dashboard-btn:hover{background:#1d4ed8}
+
+/* ===== LAYOUT ===== */
+.container{
+  max-width:1000px;
+  margin:30px auto;
+  padding:0 20px;
+}
+
+.card{
+  background:white;
+  border-radius:12px;
+  padding:28px;
+  margin-bottom:28px;
+  box-shadow:0 12px 28px rgba(0,0,0,.08);
+}
+
+h3{
+  margin-top:0;
+  font-size:20px;
+  border-bottom:1px solid #e5e7eb;
+  padding-bottom:10px;
+}
+
+/* ===== FLOATING INPUTS (FINAL FIX) ===== */
+.form-group{
+  position:relative;
+  margin-bottom:26px;
+}
+
+.form-group input,
+.form-group select,
+.form-group textarea{
+  width:100%;
+  padding:16px 12px;
+  font-size:15px;
+  border-radius:8px;
+  border:1.6px solid #cbd5e1;
+  outline:none;
+}
+
+.form-group label{
+  position:absolute;
+  left:12px;
+  top:16px;
+  background:white;
+  padding:0 6px;
+  font-size:14px;
+  color:#64748b;
+  pointer-events:none;
+  transition:.2s ease;
+}
+
+/* Focus + filled */
+.form-group input:focus,
+.form-group select:focus,
+.form-group textarea:focus{
+  border-color:#2563eb;
+  box-shadow:0 0 0 3px rgba(37,99,235,.15);
+}
+
+.form-group input:focus + label,
+.form-group select:focus + label,
+.form-group textarea:focus + label,
+.form-group input.filled + label,
+.form-group select.filled + label,
+.form-group textarea.filled + label{
+  top:-8px;
+  font-size:12px;
+  color:#2563eb;
+}
+
+/* ===== BUTTONS ===== */
+button{
+  padding:12px 22px;
+  border-radius:8px;
+  border:none;
+  font-weight:600;
+  cursor:pointer;
+}
+
+.btn-primary{background:#2563eb;color:white}
+.btn-danger{background:#dc2626;color:white}
+
+.btn-primary:hover{background:#1d4ed8}
+.btn-danger:hover{background:#b91c1c}
+
+/* ===== STATUS ===== */
+.status{
+  padding:6px 14px;
+  border-radius:999px;
+  font-weight:600;
+  font-size:13px;
+}
+
+.genuine{background:#dcfce7;color:#166534}
+.fake{background:#fee2e2;color:#991b1b}
+.partial{background:#fef3c7;color:#92400e}
+
+footer{
+  text-align:center;
+  padding:16px;
+  color:#64748b;
+  font-size:13px;
+}
+</style>
+</head>
+
+<body>
+
+<header>
+  <h2>QR Product Authenticity System</h2>
+  {% if session.role %}
+  <nav>
+    <a href="/{{ session.role }}" class="dashboard-btn">Dashboard</a>
+    <a href="/logout" class="logout-btn">Logout</a>
+  </nav>
+  {% endif %}
+</header>
+
+<div class="container">
+  {% block content %}{% endblock %}
+</div>
+
+<footer>© 2026 Product Authenticity Platform By V9 technologies</footer>
+
+<!-- ===== REQUIRED JS FOR FLOATING LABELS ===== -->
+<script>
+document.addEventListener("DOMContentLoaded",()=>{
+  document.querySelectorAll(".form-group input,.form-group textarea").forEach(el=>{
+    if(el.value.trim()!=="")el.classList.add("filled");
+    el.addEventListener("input",()=>el.classList.toggle("filled",el.value.trim()!==""));
+  });
+  document.querySelectorAll(".form-group select").forEach(el=>{
+    if(el.value)el.classList.add("filled");
+    el.addEventListener("change",()=>el.classList.toggle("filled",el.value!==""));
+  });
+});
+</script>
+
+</body>
+</html>

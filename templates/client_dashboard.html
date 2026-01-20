@@ -1,0 +1,109 @@
+{% extends "base.html" %}
+{% block content %}
+
+<h2>Product Authenticity Check</h2>
+
+<!-- ================= QR SCANNER CARD ================= -->
+<div class="card" style="max-width:520px;margin-bottom:25px;">
+  <h3>Scan QR Code</h3>
+
+  <p style="font-size:14px;color:#64748b">
+    Allow camera access to scan the QR code on the product.
+  </p>
+
+  <!-- IMPORTANT: FIXED HEIGHT -->
+  <div id="qr-reader" style="
+    width:100%;
+    height:260px;
+    border:2px dashed #cbd5f5;
+    border-radius:12px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    background:#f8fafc;
+  ">
+    <span style="color:#64748b;font-size:13px">
+      Camera loading…
+    </span>
+  </div>
+
+  <p style="font-size:12px;color:#64748b;margin-top:10px">
+    If scanning fails, enter the code manually below.
+  </p>
+</div>
+
+<!-- ================= MANUAL ENTRY ================= -->
+<div class="card" style="max-width:520px;">
+  <h3>Enter Product Code</h3>
+
+  <form method="post" id="verifyForm">
+    <div class="form-group">
+      <input name="code" id="codeInput" required placeholder=" ">
+      <label>Product Code</label>
+    </div>
+
+    <button class="btn-primary">Verify Product</button>
+  </form>
+</div>
+
+<!-- ================= RESULT ================= -->
+{% if result %}
+<div class="card" style="max-width:520px;margin-top:25px;">
+
+  {% if result.status == "GENUINE" %}
+    <h3 style="color:#16a34a">✅ Genuine Product</h3>
+    <p><b>Entered Code:</b> {{ result.code }}</p>
+    <p><b>Product:</b> {{ result.name }}</p>
+    <p><b>Brand:</b> {{ result.brand }}</p>
+    <p><b>Manufactured On:</b> {{ result.manufactured }}</p>
+
+  {% else %}
+    <h3 style="color:#dc2626">❌ Fake Product</h3>
+    <p><b>Entered Code:</b> {{ result.code }}</p>
+
+    <a href="/client/raise_token?code={{ result.code }}">
+      <button class="btn-primary" style="background:#dc2626">
+        Raise Complaint Token
+      </button>
+    </a>
+  {% endif %}
+
+</div>
+{% endif %}
+
+<!-- ================= QR SCRIPT ================= -->
+<script src="https://unpkg.com/html5-qrcode"></script>
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+
+  if (!window.Html5Qrcode) {
+    console.error("QR library not loaded");
+    return;
+  }
+
+  const qr = new Html5Qrcode("qr-reader");
+
+  Html5Qrcode.getCameras().then(cameras => {
+    if (cameras.length === 0) {
+      document.getElementById("qr-reader").innerHTML =
+        "<p style='color:#dc2626'>No camera found</p>";
+      return;
+    }
+
+    qr.start(
+      cameras[0].id,
+      { fps: 10, qrbox: 220 },
+      code => {
+        document.getElementById("codeInput").value = code;
+        qr.stop();
+      }
+    );
+  }).catch(err => {
+    document.getElementById("qr-reader").innerHTML =
+      "<p style='color:#dc2626'>Camera access denied</p>";
+  });
+
+});
+</script>
+
+{% endblock %}

@@ -1,0 +1,10 @@
+Flask==2.3.3
+Werkzeug==2.3.7
+openpyxl==3.1.2
+Flask
+Werkzeug
+openpyxl
+qrcode
+pillow
+gunicorn
+reportlab
