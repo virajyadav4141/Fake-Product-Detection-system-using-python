@@ -47,8 +47,8 @@ Improve accuracy with bigger dataset
 
 
 👨‍💻 Developed By
-V9 Technologies
-This project is proudly developed by V9 Technologies as an innovative solution for fake product detection using Python and Machine Learning.
+V9 Technology
+This project is proudly developed by V9 Technology as an innovative solution for fake product detection using Python and Machine Learning.
 
 
 📄 License
